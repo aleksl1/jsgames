@@ -1,0 +1,35 @@
+@import "./memo.css";
+@import "./minesweeper.css";
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+html {
+  scroll-behavior: smooth;
+}
+.games-menu {
+  background-color: #9147ff;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+.games-menu-list {
+  display: flex;
+  list-style: none;
+  align-items: center;
+  justify-content: flex-start;
+  height: 10vh;
+  padding-left: 2rem;
+}
+.games-menu-item {
+  text-align: center;
+  padding: 0.5rem;
+}
+.games-menu-link {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}

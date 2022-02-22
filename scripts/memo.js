@@ -34,23 +34,6 @@ const memoCards = [
   { name: "pig", url: "assets/pig.png" },
   { name: "zebra", url: "assets/zebra.png" },
 ];
-// { name: "front", url: "assets/front.png" },
-// { name: "blank", url: "assets/blank.png" },
-
-// memoCards.sort(() => 0.5 - Math.random());
-
-// for (let i = 0; i < memoCards.length; i++) {
-//   const card = document.createElement("div");
-//   const cardImg = document.createElement("img");
-//   card.classList.add("card");
-//   cardImg.classList.add("card-image");
-//   cardImg.setAttribute("src", "assets/front.png");
-//   cardImg.setAttribute("alt", "questionmark card");
-//   cardImg.setAttribute("data-name", memoCards[i].name);
-//   cardImg.setAttribute("data-id", i);
-//   card.appendChild(cardImg);
-//   memoGrid.appendChild(card);
-// }
 
 const checkForMatch = (first, second) => {
   if (first.dataset.name === second.dataset.name) {
@@ -133,8 +116,6 @@ const selectCard = (e) => {
     checkForMatch(firstCard, secondCard);
   }
 };
-
-// memoGrid.addEventListener("click", selectCard);
 
 const startGame = () => {
   memoCards.sort(() => 0.5 - Math.random());

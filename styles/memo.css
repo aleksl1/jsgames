@@ -1,0 +1,31 @@
+#memo {
+  height: 85vh;
+  padding-top: 15vh;
+  background-color: rgb(189, 189, 255);
+}
+.memo-header {
+  margin: 0 auto;
+  text-align: center;
+  padding-top: 1rem;
+}
+.memo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  width: 490px;
+  height: 490px;
+  margin: 2rem auto;
+  align-content: space-around;
+  justify-content: space-evenly;
+}
+.card,
+.card-image {
+  width: 100px;
+  height: 100px;
+}
+.restart {
+  outline: none;
+  background-color: white;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  margin-top: 2rem;
+}

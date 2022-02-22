@@ -8,9 +8,11 @@ function initGame(edgeSize, bombFieldsAmount) {
     const numberOfFields = boardSize * boardSize;
     for (let i = 0; i < numberOfFields; i++) {
       const field = document.createElement("div");
+
       field.classList.add("minesweeper-field");
       field.classList.add("unknown-field");
       field.setAttribute("data-id", i);
+      field.setAttribute("tabindex", "0");
       field.setAttribute("data-bomb", false);
 
       if (i < boardSize) {
@@ -75,6 +77,7 @@ function initGame(edgeSize, bombFieldsAmount) {
         });
         fieldsList[i].setAttribute("data-value", fieldBombValue);
         fieldsList[i].setAttribute("data-adjacent", neighbourIds);
+        fieldsList[i].setAttribute("data-waschecked", "false");
       } else if (fieldsList[i].dataset.edge === "topRight") {
         let fieldBombValue = 0;
         const neighbourIds = [
@@ -89,6 +92,7 @@ function initGame(edgeSize, bombFieldsAmount) {
         });
         fieldsList[i].setAttribute("data-value", fieldBombValue);
         fieldsList[i].setAttribute("data-adjacent", neighbourIds);
+        fieldsList[i].setAttribute("data-waschecked", "false");
       } else if (fieldsList[i].dataset.edge === "bottomLeft") {
         let fieldBombValue = 0;
         const neighbourIds = [
@@ -103,6 +107,7 @@ function initGame(edgeSize, bombFieldsAmount) {
         });
         fieldsList[i].setAttribute("data-value", fieldBombValue);
         fieldsList[i].setAttribute("data-adjacent", neighbourIds);
+        fieldsList[i].setAttribute("data-waschecked", "false");
       } else if (fieldsList[i].dataset.edge === "bottomRight") {
         let fieldBombValue = 0;
         const neighbourIds = [
@@ -117,6 +122,7 @@ function initGame(edgeSize, bombFieldsAmount) {
         });
         fieldsList[i].setAttribute("data-value", fieldBombValue);
         fieldsList[i].setAttribute("data-adjacent", neighbourIds);
+        fieldsList[i].setAttribute("data-waschecked", "false");
       }
 
       //conditions for edges
@@ -136,6 +142,7 @@ function initGame(edgeSize, bombFieldsAmount) {
         });
         fieldsList[i].setAttribute("data-value", fieldBombValue);
         fieldsList[i].setAttribute("data-adjacent", neighbourIds);
+        fieldsList[i].setAttribute("data-waschecked", "false");
       } else if (fieldsList[i].dataset.edge === "right") {
         {
           let fieldBombValue = 0;
@@ -153,6 +160,7 @@ function initGame(edgeSize, bombFieldsAmount) {
           });
           fieldsList[i].setAttribute("data-value", fieldBombValue);
           fieldsList[i].setAttribute("data-adjacent", neighbourIds);
+          fieldsList[i].setAttribute("data-waschecked", "false");
         }
       } else if (fieldsList[i].dataset.edge === "bottom") {
         {
@@ -171,6 +179,7 @@ function initGame(edgeSize, bombFieldsAmount) {
           });
           fieldsList[i].setAttribute("data-value", fieldBombValue);
           fieldsList[i].setAttribute("data-adjacent", neighbourIds);
+          fieldsList[i].setAttribute("data-waschecked", "false");
         }
       } else if (fieldsList[i].dataset.edge === "left") {
         {
@@ -189,6 +198,7 @@ function initGame(edgeSize, bombFieldsAmount) {
           });
           fieldsList[i].setAttribute("data-value", fieldBombValue);
           fieldsList[i].setAttribute("data-adjacent", neighbourIds);
+          fieldsList[i].setAttribute("data-waschecked", "false");
         }
       }
       //conditions for other fields
@@ -212,6 +222,7 @@ function initGame(edgeSize, bombFieldsAmount) {
           });
           fieldsList[i].setAttribute("data-value", fieldBombValue);
           fieldsList[i].setAttribute("data-adjacent", neighbourIds);
+          fieldsList[i].setAttribute("data-waschecked", "false");
         }
       }
     }
@@ -227,42 +238,70 @@ function initGame(edgeSize, bombFieldsAmount) {
     }
   });
 
-  const checkForBomb = (fieldId) => {
-    if (allFields[fieldId].dataset.bomb === "false") {
-      allFields[fieldId].classList.add("clear-field");
-      userClickFlag = false;
-    } else if (allFields[fieldId].dataset.bomb === "true" && !userClickFlag) {
-      allFields[fieldId].classList.add("clear-field");
-    } else if (allFields[fieldId].dataset.bomb === "true" && userClickFlag) {
-      allFields[fieldId].classList.add("bomb-field");
-      endGame();
+  const checkForBomb = (fieldId, prevFieldId) => {
+    if (allFields[fieldId].dataset.waschecked === "true") {
+      return;
+    }
+    if (
+      prevFieldId &&
+      prevFieldId !== fieldId &&
+      allFields[fieldId].dataset.waschecked === "false"
+    ) {
+      if (
+        allFields[fieldId].dataset.bomb === "false" &&
+        allFields[fieldId].dataset.value === "0"
+      ) {
+        allFields[fieldId].classList.add("clear-field");
+        allFields[fieldId].setAttribute("data-waschecked", "true");
+        checkSurroundingFields(fieldId, prevFieldId);
+      } else if (
+        allFields[fieldId].dataset.bomb === "true" ||
+        allFields[fieldId].dataset.value !== "0"
+      ) {
+        allFields[fieldId].classList.add("clear-field");
+        allFields[fieldId].setAttribute("data-waschecked", "true");
+        return;
+      }
+    } else {
+      if (allFields[fieldId].dataset.bomb === "false") {
+        allFields[fieldId].classList.add("clear-field");
+        allFields[fieldId].setAttribute("data-waschecked", "true");
+        userClickFlag = false;
+        if (allFields[fieldId].dataset.value === "0") {
+          checkSurroundingFields(fieldId);
+        } else if (allFields[fieldId].dataset.value !== "0") {
+          return;
+        }
+      } else if (allFields[fieldId].dataset.bomb === "true" && !userClickFlag) {
+        allFields[fieldId].classList.add("clear-field");
+        allFields[fieldId].setAttribute("data-waschecked", "true");
+      } else if (allFields[fieldId].dataset.bomb === "true" && userClickFlag) {
+        allFields[fieldId].classList.add("bomb-field");
+        allFields[fieldId].setAttribute("data-waschecked", "true");
+        endGame();
+      }
     }
   };
 
-  const checkSurroundingFields = (fieldId, prevFieldId) => {
-    const adjacentFields = allFields[fieldId].dataset.adjacent.split(",");
-    console.log(prevFieldId);
-    if (fieldId != prevFieldId) {
-      const prevIndex = adjacentFields.indexOf(prevFieldId);
-      adjacentFields.splice(prevIndex);
-    }
+  const checkSurroundingFields = (fieldId, ignoredField) => {
+    const prevFieldId = fieldId;
+    const adjacentFields = allFields[prevFieldId].dataset.adjacent.split(",");
 
     adjacentFields.forEach((field) => {
-      do {
-        checkForBomb(allFields[field].dataset.id);
-      } while (allFields[field].dataset.value === "0");
+      checkForBomb(field, prevFieldId);
     });
   };
 
   const clickFieldHandler = (e) => {
     userClickFlag = true;
-    checkForBomb(e.target.dataset.id);
-    if (e.target.dataset.value === "0") {
-      checkSurroundingFields(e.target.dataset.id, e.target.dataset.id);
-    }
+    checkForBomb(e.target.dataset.id, e.target.dataset.id);
   };
 
   mineBoard.addEventListener("click", clickFieldHandler);
+  mineBoard.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    e.target.classList.toggle("marked-field");
+  });
 
   const endGame = () => {
     allFields.forEach((field) => {
@@ -275,4 +314,4 @@ function initGame(edgeSize, bombFieldsAmount) {
   };
 }
 
-initGame(20, 20);
+initGame(20, 80);
